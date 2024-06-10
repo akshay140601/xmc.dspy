@@ -7,6 +7,7 @@ from typing import Union
 
 from .biodex import _load_biodex
 from .esco import _load_esco
+from .customer_category import _load_customer_category
 
 
 def get_dspy_examples(
@@ -76,6 +77,14 @@ def load_data(dataset: str):
             ontology_descriptions,
             ontology_prior,
         ) = _load_biodex()
+    elif dataset == "customer_category":
+        (
+            validation_df,
+            test_df,
+            ontology_items,
+            ontology_descriptions,
+            ontology_prior,
+        ) = _load_customer_category()
     else:
         raise ValueError("Dataset not supported.")
 
@@ -132,6 +141,11 @@ def load_data(dataset: str):
         train_examples = validation_examples[:10]
         validation_examples = validation_examples[100:150]
         test_examples = test_examples[:250]
+        
+    elif dataset == "customer_category":
+        train_examples = validation_examples
+        validation_examples = test_examples[:20]
+        test_examples = test_examples[20:]
 
     print(f"{dataset}: # Used Train size: {len(train_examples)}")
     print(f"{dataset}: # Used Validation size: {len(validation_examples)}")

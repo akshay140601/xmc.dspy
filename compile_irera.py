@@ -2,6 +2,7 @@ import os
 
 os.environ["DSP_NOTEBOOK_CACHEDIR"] = os.path.join(".", "local_cache")
 
+import dspy
 from dspy import Models
 
 from src.data_loaders import load_data
@@ -63,6 +64,21 @@ def compile_irera(
     program = InferRetrieveRank(config)
 
     # set program students
+    
+    bedrock = dspy.Bedrock(region_name = 'us-east-1')
+    
+    modules_to_lms = {
+        "infer_retrieve.infer": {
+            "teacher": dspy.AWSAnthropic(bedrock, "anthropic.claude-instant-v1"),
+            "student": dspy.AWSAnthropic(bedrock, "anthropic.claude-instant-v1"),
+        },
+        "rank": {
+            "teacher": dspy.AWSAnthropic(bedrock, "anthropic.claude-instant-v1"),
+            "student": dspy.AWSAnthropic(bedrock, "anthropic.claude-instant-v1"),
+        },
+    }
+    
+    """
     modules_to_lms = {
         "infer_retrieve.infer": {
             "teacher": Models.get_lm(infer_teacher_model_name),
@@ -73,6 +89,7 @@ def compile_irera(
             "student": Models.get_lm(rank_student_model_name),
         },
     }
+    """
 
     program.infer_retrieve.infer.cot.lm = modules_to_lms["infer_retrieve.infer"][
         "student"
